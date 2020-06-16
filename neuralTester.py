@@ -54,6 +54,7 @@ class neuralTester:
         self.loadDataset()
         self.networks = []
         self.scores = []
+        self.scoresWithId = []
 
     def loadDataset(self):
         pima = pd.read_csv('dataSet.csv', sep=";")
@@ -112,6 +113,53 @@ class neuralTester:
                                 self.networks.append(aux)
                                 self.id += 1
 
+    def createNeuralNetwork2(self):
+        self.startTime = time.time()
+        epocas = [200, 500, 1000, 2000]
+        learningRates = [0.05, 0.07, 0.1]
+        activations = ["identity", "logistic", "tanh", "relu"]
+        # 0 Hidden Layers
+        for epoca in range(len(epocas)):
+            for learningRate in learningRates:
+                for activation in activations:
+                    aux = artificialNeuron(
+                        self.id, [], epocas[epoca], learningRate, activation)
+                    self.networks.append(aux)
+                    self.id += 1
+
+        # 1 Hidden Layers
+        for first in range(1, 6):
+            for epoca in range(len(epocas)):
+                for learningRate in learningRates:
+                    for activation in activations:
+                        aux = artificialNeuron(
+                            self.id, [first], epocas[epoca], learningRate, activation)
+                        self.networks.append(aux)
+                        self.id += 1
+
+        # 2 Hidden Layers
+        for first in range(1, 6):
+            for second in range(1, 5):
+                for epoca in range(len(epocas)):
+                    for learningRate in learningRates:
+                        for activation in activations:
+                            aux = artificialNeuron(
+                                self.id, [first, second], epocas[epoca], learningRate, activation)
+                            self.networks.append(aux)
+                            self.id += 1
+
+        # 3 Hidden Layers
+        for first in range(1, 6):
+            for second in range(1, 5):
+                for third in range(1, 5):
+                    for i in range(len(epocas)):
+                        for learningRate in learningRates:
+                            for activation in activations:
+                                aux = artificialNeuron(
+                                    self.id, [first, second, third], epocas[i], learningRate, activation)
+                                self.networks.append(aux)
+                                self.id += 1
+
     def train(self):
         for i in range(len(self.networks)):
             print("Train")
@@ -138,12 +186,43 @@ class neuralTester:
         d = textFile.write(str(time.time()-self.startTime))
         textFile.close()
 
+    # Read the score array from the txt. We saved it so we dont have to run the code every time, which takes about 1:30 hours
+    def readScore(self):
+        f = open("scores.txt", "r")
+        lines = f.read().split(",")
+        for i in range(len(lines)):
+            if i == len(lines)-1:
+                self.scores.append(float(lines[i][1:-1]))
+            else:
+                self.scores.append(float(lines[i][1:]))
+
+    def findTop5Scores(self):
+        for i in range(len(self.scores)):
+            aux = [i, self.scores[i]]
+            self.scoresWithId.append(aux)
+
+        for i in range(len(self.scores)):
+            for j in range(len(self.scores)-i-1):
+                if self.scoresWithId[j][1] < self.scoresWithId[j+1][1]:
+                    self.scoresWithId[j], self.scoresWithId[j +
+                                                            1] = self.scoresWithId[j+1], self.scoresWithId[j]
+
+        self.topScores = self.scoresWithId[:5]
+        for i in range(len(self.topScores)):
+            index = self.topScores[i][0]
+            print("Neural Network number " + str(i) +
+                  " -> value: " + str(self.topScores[i][1]), end=" ")
+            print("id: " + str(index) + " Hidden Layers: " +
+                  str(self.networks[index].hiddenLayers) + " Activation Func: " +
+                  str(self.networks[index].activationFunction)
+                  + " Learning Rate: " + str(self.networks[index].learningRate) + " Epocas: " + str(self.networks[index].epocas))
+
     def printNumberOfNets(self):
         print(self.id)
 
 
 neuralTesterObj = neuralTester()
 neuralTesterObj.createNeuralNetwork()
-neuralTesterObj.train()
-neuralTesterObj.writeScore()
+neuralTesterObj.readScore()
+neuralTesterObj.findTop5Scores()
 neuralTesterObj.printNumberOfNets()
