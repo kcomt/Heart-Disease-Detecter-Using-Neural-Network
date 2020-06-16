@@ -5,6 +5,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
+import time
 
 
 class artificialNeuron:
@@ -65,8 +66,9 @@ class neuralTester:
             xStandard, y, test_size=0.2)
 
     def createNeuralNetwork(self):
-        epocas = [10, 10, 10, 10, 10]
-        learningRates = [0.01, 0.05, 0.1, 0.3]
+        self.startTime = time.time()
+        epocas = [10, 100, 500, 1000]
+        learningRates = [0.05, 0.1, 0.3]
         activations = ["identity", "logistic", "tanh", "relu"]
         # 0 Hidden Layers
         for epoca in range(len(epocas)-2):
@@ -102,7 +104,7 @@ class neuralTester:
         for first in range(1, 6):
             for second in range(1, 5):
                 for third in range(1, 4):
-                    for i in range(3, len(epocas)):
+                    for i in range(2, len(epocas)):
                         for learningRate in learningRates:
                             for activation in activations:
                                 aux = artificialNeuron(
@@ -111,14 +113,18 @@ class neuralTester:
                                 self.id += 1
 
     def train(self):
-        for i in range(50):
+        for i in range(len(self.networks)):
+            print("Train")
+            print(i)
             self.networks[i].train(self.xTrain, self.yTrain)
 
     # We are using F1 because we think it is the best metric for our case, getting the avg between recall and precision
-    def score(self):
+    def writeScore(self):
         k = 10
         kfold = KFold(n_splits=k)
-        for i in range(50):
+        for i in range(len(self.networks)):
+            print("Score")
+            print(i)
             score = cross_val_score(
                 self.networks[i].neuralNetwork, self.xTrain, self.yTrain, cv=kfold, scoring='f1_macro')
             avg = np.mean(score)
@@ -128,6 +134,9 @@ class neuralTester:
         textFile = open("scores.txt", "w")
         n = textFile.write(str(self.scores))
         textFile.close()
+        textFile = open("executionTime.txt", "w")
+        d = textFile.write(str(time.time()-self.startTime))
+        textFile.close()
 
     def printNumberOfNets(self):
         print(self.id)
@@ -136,5 +145,5 @@ class neuralTester:
 neuralTesterObj = neuralTester()
 neuralTesterObj.createNeuralNetwork()
 neuralTesterObj.train()
-neuralTesterObj.score()
+neuralTesterObj.writeScore()
 neuralTesterObj.printNumberOfNets()
