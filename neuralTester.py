@@ -63,38 +63,43 @@ class neuralTester:
             xStandard, y, test_size=0.2)
 
     def createNeuralNetwork(self):
-        epocas = [10, 100, 200, 500, 1000]
-        learningRates = [0.001, 0.005, 0.01, 0.05,
-                         0.07, 0.1, 0.2, 0.3, 0.5]
+        epocas = [10, 100, 200, 500, 1000, 2000]
+        learningRates = [0.001, 0.01, 0.05, 0.1, 0.2, 0.3, 0.5]
         activations = ["identity", "logistic", "tanh", "relu"]
+        # 0 Hidden Layers
+        for epoca in range(len(epocas)-2):
+            for learningRate in learningRates:
+                for activation in activations:
+                    aux = artificialNeuron(
+                        self.id, [], epocas[epoca], learningRate, activation)
+                    self.networks.append(aux)
+                    self.id += 1
 
         # 1 Hidden Layers
-        for first in range(1, 9):
-            for epoca in epocas:
+        for first in range(1, 8):
+            for epoca in range(1, len(epocas)-1):
                 for learningRate in learningRates:
                     for activation in activations:
-                        print(self.id)
                         aux = artificialNeuron(
-                            self.id, [first], epocas, learningRate, activation)
-                        aux.train(self.xTrain, self.yTrain)
+                            self.id, [first], epocas[epoca], learningRate, activation)
                         self.networks.append(aux)
                         self.id += 1
 
         # 2 Hidden Layers
-        for first in range(1, 9):
-            for second in range(1, 9):
-                for epoca in epocas:
+        for first in range(1, 8):
+            for second in range(1, 8):
+                for epoca in range(2, len(epocas)):
                     for learningRate in learningRates:
                         for activation in activations:
                             aux = artificialNeuron(
-                                self.id, [first, second], epocas, learningRate, activation)
+                                self.id, [first, second], epocas[epoca], learningRate, activation)
                             self.networks.append(aux)
                             self.id += 1
 
         # 3 Hidden Layers
-        for first in range(1, 9):
-            for second in range(1, 9):
-                for third in range(1, 9):
+        for first in range(1, 8):
+            for second in range(1, 8):
+                for third in range(1, 8):
                     for i in range(3, len(epocas)):
                         for learningRate in learningRates:
                             for activation in activations:
@@ -103,9 +108,13 @@ class neuralTester:
                                 self.networks.append(aux)
                                 self.id += 1
 
-        # ai = artificialNeuron(0, [1, 2], 100, 0.3, "logistic")
+        #ai = artificialNeuron(0, [1, 2], 100, 0.3, "logistic")
         #ai.train(self.xTrain, self.yTrain)
         print(self.id)
+
+    def train(self):
+        for network in self.networks:
+            self.networks[i].train(self.xTrain, self.yTrain)
 
 
 neuralTesterObj = neuralTester()
