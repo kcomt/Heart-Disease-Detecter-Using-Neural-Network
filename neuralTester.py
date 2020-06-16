@@ -111,19 +111,23 @@ class neuralTester:
                                 self.id += 1
 
     def train(self):
-        for i in range(100):
+        for i in range(50):
             self.networks[i].train(self.xTrain, self.yTrain)
 
     # We are using F1 because we think it is the best metric for our case, getting the avg between recall and precision
     def score(self):
         k = 10
         kfold = KFold(n_splits=k)
-        for i in range(100):
+        for i in range(50):
             score = cross_val_score(
                 self.networks[i].neuralNetwork, self.xTrain, self.yTrain, cv=kfold, scoring='f1_macro')
             avg = np.mean(score)
             avg = round(avg, 3)
             self.scores.append(avg)
+
+        textFile = open("scores.txt", "w")
+        n = textFile.write(str(self.scores))
+        textFile.close()
 
     def printNumberOfNets(self):
         print(self.id)
