@@ -4,6 +4,7 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
+import numpy as np
 
 
 class artificialNeuron:
@@ -51,6 +52,7 @@ class neuralTester:
         self.id = 0
         self.loadDataset()
         self.networks = []
+        self.scores = []
 
     def loadDataset(self):
         pima = pd.read_csv('dataSet.csv', sep=";")
@@ -63,8 +65,8 @@ class neuralTester:
             xStandard, y, test_size=0.2)
 
     def createNeuralNetwork(self):
-        epocas = [10, 100, 200, 500, 1000, 2000]
-        learningRates = [0.001, 0.01, 0.05, 0.1, 0.2, 0.3, 0.5]
+        epocas = [10, 10, 10, 10, 10]
+        learningRates = [0.01, 0.05, 0.1, 0.3]
         activations = ["identity", "logistic", "tanh", "relu"]
         # 0 Hidden Layers
         for epoca in range(len(epocas)-2):
@@ -76,7 +78,7 @@ class neuralTester:
                     self.id += 1
 
         # 1 Hidden Layers
-        for first in range(1, 8):
+        for first in range(1, 6):
             for epoca in range(1, len(epocas)-1):
                 for learningRate in learningRates:
                     for activation in activations:
@@ -86,8 +88,8 @@ class neuralTester:
                         self.id += 1
 
         # 2 Hidden Layers
-        for first in range(1, 8):
-            for second in range(1, 8):
+        for first in range(1, 6):
+            for second in range(1, 5):
                 for epoca in range(2, len(epocas)):
                     for learningRate in learningRates:
                         for activation in activations:
@@ -97,9 +99,9 @@ class neuralTester:
                             self.id += 1
 
         # 3 Hidden Layers
-        for first in range(1, 8):
-            for second in range(1, 8):
-                for third in range(1, 8):
+        for first in range(1, 6):
+            for second in range(1, 5):
+                for third in range(1, 4):
                     for i in range(3, len(epocas)):
                         for learningRate in learningRates:
                             for activation in activations:
@@ -108,14 +110,27 @@ class neuralTester:
                                 self.networks.append(aux)
                                 self.id += 1
 
-        #ai = artificialNeuron(0, [1, 2], 100, 0.3, "logistic")
-        #ai.train(self.xTrain, self.yTrain)
-        print(self.id)
-
     def train(self):
-        for network in self.networks:
+        for i in range(100):
             self.networks[i].train(self.xTrain, self.yTrain)
+
+    # We are using F1 because we think it is the best metric for our case, getting the avg between recall and precision
+    def score(self):
+        k = 10
+        kfold = KFold(n_splits=k)
+        for i in range(100):
+            score = cross_val_score(
+                self.networks[i].neuralNetwork, self.xTrain, self.yTrain, cv=kfold, scoring='f1_macro')
+            avg = np.mean(score)
+            avg = round(avg, 3)
+            self.scores.append(avg)
+
+    def printNumberOfNets(self):
+        print(self.id)
 
 
 neuralTesterObj = neuralTester()
 neuralTesterObj.createNeuralNetwork()
+neuralTesterObj.train()
+neuralTesterObj.score()
+neuralTesterObj.printNumberOfNets()
