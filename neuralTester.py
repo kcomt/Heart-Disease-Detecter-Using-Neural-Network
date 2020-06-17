@@ -115,7 +115,7 @@ class neuralTester:
 
     def createNeuralNetwork2(self):
         self.startTime = time.time()
-        epocas = [200, 500, 1000, 2000]
+        epocas = [500, 1000, 2000]
         learningRates = [0.05, 0.06, 0.07, 0.1]
         activations = ["identity", "logistic", "tanh", "relu"]
         # 0 Hidden Layers
@@ -151,7 +151,7 @@ class neuralTester:
         # 3 Hidden Layers
         for first in range(1, 6):
             for second in range(1, 5):
-                for third in range(1, 5):
+                for third in range(1, 4):
                     for i in range(len(epocas)):
                         for learningRate in learningRates:
                             for activation in activations:
@@ -166,6 +166,7 @@ class neuralTester:
             print(i)
             self.networks[i].train(self.xTrain, self.yTrain)
 
+    #4127 + 2064
     # We are using F1 because we think it is the best metric for our case, getting the avg between recall and precision
     def writeScore(self, iteration):
         for i in range(len(self.networks)):
@@ -196,7 +197,7 @@ class neuralTester:
 
     # Read the score array from the txt. We saved it so we dont have to run the code every time, which takes about 1:30 hours
     def readScore(self):
-        f = open("scores.txt", "r")
+        f = open("scores2.txt", "r")
         lines = f.read().split(",")
         for i in range(len(lines)):
             if i == len(lines)-1:
@@ -230,13 +231,7 @@ class neuralTester:
 
 
 neuralTesterObj = neuralTester()
-neuralTesterObj.createNeuralNetwork()
+neuralTesterObj.createNeuralNetwork2()
 neuralTesterObj.readScore()
 neuralTesterObj.findTop5Scores()
 neuralTesterObj.printNumberOfNets()
-
-#neuralTesterObj = neuralTester()
-# neuralTesterObj.createNeuralNetwork2()
-# neuralTesterObj.train()
-# neuralTesterObj.writeScore(2)
-# neuralTesterObj.printNumberOfNets()

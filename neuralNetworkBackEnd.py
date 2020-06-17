@@ -11,8 +11,8 @@ import time
 class neuralNetwork:
     def __init__(self):
         self.loadDataset()
-        self.neuralNetwork = MLPClassifier(hidden_layer_sizes=(3, 3), max_iter=1000,
-                                           learning_rate_init=0.05, activation='identity')
+        self.neuralNetwork = MLPClassifier(hidden_layer_sizes=(2, 4), max_iter=2000,
+                                           learning_rate_init=0.07, activation='identity')
 
     def loadDataset(self):
         pima = pd.read_csv('dataSet.csv', sep=";")
