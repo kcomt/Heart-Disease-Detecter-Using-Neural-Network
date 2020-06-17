@@ -116,7 +116,7 @@ class neuralTester:
     def createNeuralNetwork2(self):
         self.startTime = time.time()
         epocas = [200, 500, 1000, 2000]
-        learningRates = [0.05, 0.07, 0.1]
+        learningRates = [0.05, 0.06, 0.07, 0.1]
         activations = ["identity", "logistic", "tanh", "relu"]
         # 0 Hidden Layers
         for epoca in range(len(epocas)):
@@ -167,24 +167,32 @@ class neuralTester:
             self.networks[i].train(self.xTrain, self.yTrain)
 
     # We are using F1 because we think it is the best metric for our case, getting the avg between recall and precision
-    def writeScore(self):
-        k = 10
-        kfold = KFold(n_splits=k)
+    def writeScore(self, iteration):
         for i in range(len(self.networks)):
             print("Score")
             print(i)
+            k = 10
+            kfold = KFold(n_splits=k)
             score = cross_val_score(
                 self.networks[i].neuralNetwork, self.xTrain, self.yTrain, cv=kfold, scoring='f1_macro')
             avg = np.mean(score)
             avg = round(avg, 3)
             self.scores.append(avg)
 
-        textFile = open("scores.txt", "w")
-        n = textFile.write(str(self.scores))
-        textFile.close()
-        textFile = open("executionTime.txt", "w")
-        d = textFile.write(str(time.time()-self.startTime))
-        textFile.close()
+        if iteration == 1:
+            textFile = open("scores.txt", "w")
+            n = textFile.write(str(self.scores))
+            textFile.close()
+            textFile = open("executionTime.txt", "w")
+            d = textFile.write(str(time.time()-self.startTime))
+            textFile.close()
+        else:
+            textFile = open("scores2.txt", "w")
+            n = textFile.write(str(self.scores))
+            textFile.close()
+            textFile = open("executionTime2.txt", "w")
+            d = textFile.write(str(time.time()-self.startTime))
+            textFile.close()
 
     # Read the score array from the txt. We saved it so we dont have to run the code every time, which takes about 1:30 hours
     def readScore(self):
@@ -226,3 +234,9 @@ neuralTesterObj.createNeuralNetwork()
 neuralTesterObj.readScore()
 neuralTesterObj.findTop5Scores()
 neuralTesterObj.printNumberOfNets()
+
+#neuralTesterObj = neuralTester()
+# neuralTesterObj.createNeuralNetwork2()
+# neuralTesterObj.train()
+# neuralTesterObj.writeScore(2)
+# neuralTesterObj.printNumberOfNets()
